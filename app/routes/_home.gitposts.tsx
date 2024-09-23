@@ -7,12 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ViewComments } from "~/components/view-comments";
 import { ViewLikes } from "~/components/view-likes";
 import { WritePost } from "~/components/write-post";
+import { getAllPostsWithDetails } from "~/lib/database.server";
 import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
+import {
+  combinePostsWithLikes,
+  formatToXDate,
+  getUserDataFromSession,
+} from "~/lib/utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { headers, serverSession } = await getSupabaseWithSessionAndHeaders({
-    request,
-  });
+  const { headers, supabase, serverSession } =
+    await getSupabaseWithSessionAndHeaders({
+      request,
+    });
 
   if (!serverSession) {
     return redirect("/login", { headers });
@@ -22,12 +29,25 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const searchParams = url.searchParams;
   const query = searchParams.get("query");
 
-  return json({ query }, { headers });
+  const { data } = await getAllPostsWithDetails({ dbClient: supabase });
+
+  const {
+    userId: sessionUserId,
+    // username,
+    // userAvatarUrl,
+  } = getUserDataFromSession(serverSession);
+
+  const posts = combinePostsWithLikes(data, sessionUserId);
+
+  return json({ query, posts }, { headers });
 };
 
 export default function Gitposts() {
-  const { query } = useLoaderData<typeof loader>();
+  const { query, posts } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  const post = posts[0];
+
+  console.log("🚀 > Gitposts > post:", post);
 
   const isSearching = Boolean(
     navigation.location &&
@@ -45,18 +65,23 @@ export default function Gitposts() {
           <Separator />
           <PostSearch isSearching={isSearching} searchQuery={query} />
           <Post
-            avatarUrl={
-              "https://avatars.githubusercontent.com/u/67491712?s=400&v=4"
-            }
-            name="bahori"
-            username="bahori1991"
-            title={"### markdown title"}
-            userId="12345"
-            id="56789"
-            dateTimeString="30, Nov 2024"
+            avatarUrl={post.author.avatar_url}
+            name={post.author.name}
+            username={post.author.username}
+            title={post.title}
+            userId={post.author.id}
+            id={post.id}
+            dateTimeString={formatToXDate(post.created_at)}
           >
-            <ViewLikes likes={114514} pathname={"profile/bahori1991"} />
-            <ViewComments comments={810} pathname="/profile/baori1991" />
+            <ViewLikes
+              likes={post.likes.length}
+              likedByUser={post.isLikedByUser}
+              pathname={"profile/bahori1991"}
+            />
+            <ViewComments
+              comments={post.comments.length}
+              pathname="/profile/baori1991"
+            />
           </Post>
         </TabsContent>
         <TabsContent value="write-post">
