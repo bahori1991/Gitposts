@@ -4,6 +4,9 @@ import { Post } from "~/components/post";
 import { PostSearch } from "~/components/post-search";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { ViewComments } from "~/components/view-comments";
+import { ViewLikes } from "~/components/view-likes";
+import { WritePost } from "~/components/write-post";
 
 export const loader = ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -43,11 +46,13 @@ export default function Gitposts() {
             id="56789"
             dateTimeString="30, Nov 2024"
           >
-            {/* <ViewLikes /> */}
-            {/* <ViewComments /> */}
+            <ViewLikes likes={114514} pathname={"profile/bahori1991"} />
+            <ViewComments comments={810} pathname="/profile/baori1991" />
           </Post>
         </TabsContent>
-        <TabsContent value="write-post">{/* <WritePost /> */}</TabsContent>
+        <TabsContent value="write-post">
+          <WritePost sessionUserId="1234" postId="1234" />
+        </TabsContent>
       </Tabs>
     </div>
   );
