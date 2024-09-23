@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { json, useLoaderData, useNavigation } from "@remix-run/react";
+import { Post } from "~/components/post";
 import { PostSearch } from "~/components/post-search";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -31,10 +32,20 @@ export default function Gitposts() {
         <TabsContent value="view-posts">
           <Separator />
           <PostSearch isSearching={isSearching} searchQuery={query} />
-          {/* <Post>
-            <ViewLikes />
-            <ViewComments />
-          </Post> */}
+          <Post
+            avatarUrl={
+              "https://avatars.githubusercontent.com/u/67491712?s=400&v=4"
+            }
+            name="bahori"
+            username="bahori1991"
+            title={"### markdown title"}
+            userId="12345"
+            id="56789"
+            dateTimeString="30, Nov 2024"
+          >
+            {/* <ViewLikes /> */}
+            {/* <ViewComments /> */}
+          </Post>
         </TabsContent>
         <TabsContent value="write-post">{/* <WritePost /> */}</TabsContent>
       </Tabs>
