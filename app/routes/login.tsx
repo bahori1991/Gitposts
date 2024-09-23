@@ -1,10 +1,22 @@
-import { Link } from "@remix-run/react";
+import { Link, useOutletContext } from "@remix-run/react";
 import { AppLogo } from "~/components/app-logo";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { FaGithub } from "react-icons/fa";
+import { SupabaseOutletContext } from "~/lib/supabase";
 
 export default function Login() {
+  const { supabase, domainUrl } = useOutletContext<SupabaseOutletContext>();
+
+  const handleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${domainUrl}/resources/auth/callback`,
+      },
+    });
+  };
+
   return (
     <section className="w-full bg-white min-h-screen flex flex-col">
       <nav className="flex items-center space-x-2 p-4">

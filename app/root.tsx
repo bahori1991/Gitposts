@@ -1,13 +1,19 @@
 import {
+  json,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
-
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import styles from "./tailwind.css?url";
+import {
+  getSupabaseEnv,
+  getSupabaseWithSessionAndHeaders,
+} from "./lib/supabase.server";
+import { useSupabase } from "./lib/supabase";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,7 +32,20 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { serverSession, headers } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
+  const domainUrl = process.env.DOMAIN_URL!;
+  const env = getSupabaseEnv();
+
+  return json({ serverSession, env, domainUrl }, { headers });
+};
+
+export default function App() {
+  const { env, serverSession, domainUrl } = useLoaderData<typeof loader>();
+  const { supabase } = useSupabase({ env, serverSession });
+
   return (
     <html lang="en">
       <head>
@@ -36,14 +55,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <Outlet context={{ supabase, domainUrl }} />
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }
