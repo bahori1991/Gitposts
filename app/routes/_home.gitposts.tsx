@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { json, useLoaderData, useNavigation } from "@remix-run/react";
+import { json, redirect, useLoaderData, useNavigation } from "@remix-run/react";
 import { Post } from "~/components/post";
 import { PostSearch } from "~/components/post-search";
 import { Separator } from "~/components/ui/separator";
@@ -7,13 +7,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ViewComments } from "~/components/view-comments";
 import { ViewLikes } from "~/components/view-likes";
 import { WritePost } from "~/components/write-post";
+import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
 
-export const loader = ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { headers, serverSession } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
+
+  if (!serverSession) {
+    return redirect("/login", { headers });
+  }
+
   const url = new URL(request.url);
   const searchParams = url.searchParams;
   const query = searchParams.get("query");
 
-  return json({ query });
+  return json({ query }, { headers });
 };
 
 export default function Gitposts() {

@@ -1,9 +1,23 @@
-import { Link, useOutletContext } from "@remix-run/react";
+import { json, Link, redirect, useOutletContext } from "@remix-run/react";
 import { AppLogo } from "~/components/app-logo";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { FaGithub } from "react-icons/fa";
 import { SupabaseOutletContext } from "~/lib/supabase";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { headers, serverSession } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
+
+  if (serverSession) {
+    return redirect("/gitposts", { headers });
+  }
+
+  return json({ success: true }, { headers });
+};
 
 export default function Login() {
   const { supabase, domainUrl } = useOutletContext<SupabaseOutletContext>();
@@ -42,7 +56,7 @@ export default function Login() {
         </div>
         <Card className="relative group overflow-hidden rounded-lg">
           <CardContent className="p-1 bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 bg-300% animate-gradient">
-            <Button onClick={() => console.log("login")}>
+            <Button onClick={handleSignIn}>
               <FaGithub className="mr-2 h-4 w-4" />
               Github
             </Button>

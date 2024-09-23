@@ -1,7 +1,21 @@
-import { Link } from "@remix-run/react";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { json, Link, redirect } from "@remix-run/react";
 import { AppLogo } from "~/components/app-logo";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { headers, serverSession } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
+
+  if (serverSession) {
+    return redirect("/gitposts", { headers });
+  }
+
+  return json({ success: true }, { headers });
+};
 
 export default function Index() {
   return (
