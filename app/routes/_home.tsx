@@ -8,7 +8,7 @@ export default function Home() {
   const [isNavOpen, setNavOpen] = useState(false);
 
   return (
-    <section className="w-full min-h-screen bg-white flex flex-col">
+    <section className="w-full min-h-screen bg-white flex flex-col items-center">
       <nav className="sticky top-0 z-50 flex w-full items-center justify-between p-4 border-b border-zinc-200 flex-wrap md:flex-nowrap">
         <Link to="/" className="flex items-center space-x-2">
           <AppLogo className="h-8 w-8 md:h-10 md:w-10" />
