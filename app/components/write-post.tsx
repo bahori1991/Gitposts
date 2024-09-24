@@ -9,17 +9,29 @@ import {
 } from "./ui/card";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import { useFetcher } from "@remix-run/react";
+import { RxUpdate } from "react-icons/rx";
 
 type WritePostProps = {
-  sessionUserId: string;
-  postId: string;
+  userId: string;
 };
 
-export function WritePost({ sessionUserId, postId }: WritePostProps) {
+export function WritePost({ userId }: WritePostProps) {
   const [title, setTitle] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fetcher = useFetcher();
+  const isPosting = fetcher.state !== "idle";
+  const isDisabled = isPosting || !title;
+  const postActionUrl = "/resources/post";
 
-  const postTitle = () => console.log("Posting to server...");
+  const postTitle = () => {
+    const formData = {
+      title,
+      userId,
+    };
+    fetcher.submit(formData, { method: "POST", action: postActionUrl });
+    setTitle("");
+  };
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -49,7 +61,10 @@ export function WritePost({ sessionUserId, postId }: WritePostProps) {
         />
       </CardContent>
       <CardFooter>
-        <Button onClick={postTitle}>Post</Button>
+        <Button onClick={postTitle} disabled={isDisabled}>
+          {isPosting && <RxUpdate className="mr-2 h-4 w-4 animate-spin" />}
+          {isPosting ? "Posting" : "Post"}
+        </Button>
       </CardFooter>
     </Card>
   );

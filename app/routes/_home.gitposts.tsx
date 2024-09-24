@@ -30,18 +30,26 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 
   const {
-    userId: sessionUserId,
+    userId: userId,
     // username,
     // userAvatarUrl,
   } = getUserDataFromSession(user);
 
-  const posts = combinePostsWithLikes(data, sessionUserId);
+  const posts = combinePostsWithLikes(data, userId);
 
-  return json({ query, posts, totalPages }, { headers });
+  return json(
+    { query, posts, totalPages, userDetails: { userId } },
+    { headers }
+  );
 };
 
 export default function Gitposts() {
-  const { query, posts, totalPages } = useLoaderData<typeof loader>();
+  const {
+    query,
+    posts,
+    totalPages,
+    userDetails: { userId },
+  } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
 
   const isSearching = Boolean(
@@ -62,7 +70,7 @@ export default function Gitposts() {
           <InfiniteVirtualList incomingPosts={posts} totalPages={totalPages} />
         </TabsContent>
         <TabsContent value="write-post">
-          <WritePost sessionUserId="1234" postId="1234" />
+          <WritePost userId={userId} />
         </TabsContent>
       </Tabs>
     </div>

@@ -38,3 +38,19 @@ export async function getAllPostsWithDetails({
     totalPages: count ? Math.ceil(count / limit) : 1,
   };
 }
+
+export async function createPost({
+  dbClient,
+  userId,
+  title,
+}: {
+  dbClient: SupabaseClient<Database>;
+  userId: string;
+  title: string;
+}) {
+  const { error } = await dbClient
+    .from("posts")
+    .insert({ user_id: userId, title });
+
+  return { error };
+}
