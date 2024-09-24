@@ -1,11 +1,43 @@
-import { Link, Outlet, useNavigate, useOutletContext } from "@remix-run/react";
+import {
+  json,
+  Link,
+  Outlet,
+  redirect,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from "@remix-run/react";
 import { useState } from "react";
 import { AppLogo } from "~/components/app-logo";
 import { RxCross1, RxHamburgerMenu } from "react-icons/rx";
 import { Button } from "~/components/ui/button";
 import { SupabaseOutletContext } from "~/lib/supabase";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
+import { getUserDataFromSession } from "~/lib/utils";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { headers, supabase, user } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
+
+  if (!user) {
+    return redirect("/login", { headers });
+  }
+
+  const { userId, userAvatarUrl, username } = getUserDataFromSession(user);
+
+  return json(
+    { userDetails: { userId, userAvatarUrl, username } },
+    { headers }
+  );
+};
 
 export default function Home() {
+  const {
+    userDetails: { userAvatarUrl, username },
+  } = useLoaderData<typeof loader>();
+
   const [isNavOpen, setNavOpen] = useState(false);
   const { supabase } = useOutletContext<SupabaseOutletContext>();
   const navigate = useNavigate();
@@ -32,12 +64,12 @@ export default function Home() {
               : "hidden md:flex"
           }`}
         >
-          <Link to={`/profile/bahori1991`}>@bahori1991</Link>
+          <Link to={`/profile/${username}`}>@{username}</Link>
           <img
             alt="profile"
             className="rounded-full"
             height="40"
-            src={`https://avatars.githubusercontent.com/u/67491712?s=400&v=4`}
+            src={userAvatarUrl}
             style={{
               aspectRatio: "40/40",
               objectFit: "cover",
