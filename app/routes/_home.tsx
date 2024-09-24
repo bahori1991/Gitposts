@@ -1,4 +1,4 @@
-import { Link, Outlet, useOutletContext } from "@remix-run/react";
+import { Link, Outlet, useNavigate, useOutletContext } from "@remix-run/react";
 import { useState } from "react";
 import { AppLogo } from "~/components/app-logo";
 import { RxCross1, RxHamburgerMenu } from "react-icons/rx";
@@ -8,9 +8,11 @@ import { SupabaseOutletContext } from "~/lib/supabase";
 export default function Home() {
   const [isNavOpen, setNavOpen] = useState(false);
   const { supabase } = useOutletContext<SupabaseOutletContext>();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    navigate("/login");
   };
 
   return (

@@ -8,11 +8,11 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { headers, serverSession } = await getSupabaseWithSessionAndHeaders({
+  const { headers, user } = await getSupabaseWithSessionAndHeaders({
     request,
   });
 
-  if (serverSession) {
+  if (user) {
     return redirect("/gitposts", { headers });
   }
 

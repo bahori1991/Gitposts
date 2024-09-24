@@ -1,8 +1,7 @@
-import { useRevalidator } from "@remix-run/react";
 import { createBrowserClient } from "@supabase/ssr";
-import { Session, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "database.types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export type TypedSupabaseClient = SupabaseClient<Database>;
 
@@ -18,30 +17,12 @@ type SupabaseEnv = {
 
 type UseSupabase = {
   env: SupabaseEnv;
-  serverSession: Session | null;
 };
 
-export const useSupabase = ({ env, serverSession }: UseSupabase) => {
+export const useSupabase = ({ env }: UseSupabase) => {
   const [supabase] = useState(() =>
     createBrowserClient<Database>(env.SUPABASE_URL!, env.SUPABASE_ANON_KEY)
   );
-
-  const serverAccessToken = serverSession?.access_token;
-  const revalidator = useRevalidator();
-
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.access_token !== serverAccessToken) {
-        revalidator.revalidate();
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth, serverAccessToken, revalidator]);
 
   return { supabase };
 };

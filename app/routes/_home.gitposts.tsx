@@ -10,12 +10,11 @@ import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
 import { combinePostsWithLikes, getUserDataFromSession } from "~/lib/utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { headers, supabase, serverSession } =
-    await getSupabaseWithSessionAndHeaders({
-      request,
-    });
+  const { headers, supabase, user } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
 
-  if (!serverSession) {
+  if (!user) {
     return redirect("/login", { headers });
   }
 
@@ -33,7 +32,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     userId: sessionUserId,
     // username,
     // userAvatarUrl,
-  } = getUserDataFromSession(serverSession);
+  } = getUserDataFromSession(user);
 
   const posts = combinePostsWithLikes(data, sessionUserId);
 

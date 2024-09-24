@@ -33,18 +33,18 @@ export const links: LinksFunction = () => [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { serverSession, headers } = await getSupabaseWithSessionAndHeaders({
+  const { user, headers } = await getSupabaseWithSessionAndHeaders({
     request,
   });
   const domainUrl = process.env.DOMAIN_URL!;
   const env = getSupabaseEnv();
 
-  return json({ serverSession, env, domainUrl }, { headers });
+  return json({ user, env, domainUrl }, { headers });
 };
 
 export default function App() {
-  const { env, serverSession, domainUrl } = useLoaderData<typeof loader>();
-  const { supabase } = useSupabase({ env, serverSession });
+  const { env, domainUrl } = useLoaderData<typeof loader>();
+  const { supabase } = useSupabase({ env });
 
   return (
     <html lang="en">

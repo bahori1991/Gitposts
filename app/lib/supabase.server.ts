@@ -41,8 +41,8 @@ export async function getSupabaseWithSessionAndHeaders({
 }) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const {
-    data: { session: serverSession },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return { supabase, headers, serverSession };
+  return { supabase, headers, user };
 }

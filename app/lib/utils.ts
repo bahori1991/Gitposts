@@ -1,4 +1,4 @@
-import { Session } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { PostWithDetails } from "./types";
@@ -7,10 +7,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getUserDataFromSession(session: Session) {
-  const userId = session.user.id;
-  const userAvatarUrl = session.user.user_metadata.avatar_url;
-  const username = session.user.user_metadata.user_name;
+export function getUserDataFromSession(user: User) {
+  const userId = user.id;
+  const userAvatarUrl = user.user_metadata.avatar_url;
+  const username = user.user_metadata.user_name;
 
   return { userId, userAvatarUrl, username };
 }
