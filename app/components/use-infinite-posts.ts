@@ -1,4 +1,4 @@
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLocation } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { loader as postsLoader } from "~/routes/_home.gitposts";
 import { CombinedPostsWithAuthorAndLikes } from "~/lib/types";
@@ -16,11 +16,27 @@ export const useInfinitePosts = ({
     useState<CombinedPostsWithAuthorAndLikes>(incomingPosts);
   const fetcher = useFetcher<typeof postsLoader>();
   const [currentPage, setCurrentPage] = useState(1);
+  const location = useLocation();
   const hasMorePages = currentPage < totalPages;
+
+  const [prevPosts, setPrevPosts] = useState(incomingPosts);
+  if (incomingPosts !== prevPosts) {
+    setPrevPosts(incomingPosts);
+    setPosts(incomingPosts);
+    setCurrentPage(1);
+  }
 
   const loadMore = () => {
     if (hasMorePages && fetcher.state === "idle") {
-      fetcher.load(`/gitposts?page=${currentPage + 1}`);
+      let fullSearchQueryParams = "";
+
+      if (location.search) {
+        fullSearchQueryParams = `${location.search}&page=${currentPage + 1}`;
+      } else {
+        fullSearchQueryParams = `?page=${currentPage + 1}`;
+      }
+
+      fetcher.load(`${location.pathname}/${fullSearchQueryParams}`);
     }
   };
 

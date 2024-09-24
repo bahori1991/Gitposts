@@ -3,6 +3,7 @@ import { useInfinitePosts } from "./use-infinite-posts";
 import { Virtuoso } from "react-virtuoso";
 import { MemorizedPostListItem } from "./memorized-post-list-item";
 import { PostSkeleton } from "./post";
+import { AppLogo } from "./app-logo";
 
 export function InfiniteVirtualList({
   totalPages,
@@ -15,6 +16,15 @@ export function InfiniteVirtualList({
     incomingPosts,
     totalPages,
   });
+
+  if (!posts.length) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <AppLogo className="h-10 w-10" />
+        <h2 className="ml-2">No posts found</h2>
+      </div>
+    );
+  }
 
   return (
     <Virtuoso

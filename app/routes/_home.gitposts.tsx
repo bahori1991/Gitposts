@@ -26,6 +26,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { data, totalPages } = await getAllPostsWithDetails({
     dbClient: supabase,
     page: isNaN(page) ? 1 : page,
+    searchQuery: query,
   });
 
   const {
