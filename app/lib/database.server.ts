@@ -111,3 +111,66 @@ export async function getPostsForUser({
     totalPages: count ? Math.ceil(count / limit) : 1,
   };
 }
+
+export async function insertLike({
+  dbClient,
+  userId,
+  postId,
+}: {
+  dbClient: SupabaseClient<Database>;
+  userId: string;
+  postId: string;
+}) {
+  const { error } = await dbClient
+    .from("likes")
+    .insert({ user_id: userId, post_id: postId });
+
+  if (error) {
+    console.log("Error occured at insertLike", error);
+  }
+
+  return { error };
+}
+
+export async function deleteLike({
+  dbClient,
+  userId,
+  postId,
+}: {
+  dbClient: SupabaseClient<Database>;
+  userId: string;
+  postId: string;
+}) {
+  const { error } = await dbClient
+    .from("likes")
+    .delete()
+    .match({ user_id: userId, post_id: postId });
+
+  if (error) {
+    console.log("Error occured at deleteLike", error);
+  }
+
+  return { error };
+}
+
+export async function insertComment({
+  dbClient,
+  userId,
+  postId,
+  title,
+}: {
+  dbClient: SupabaseClient<Database>;
+  userId: string;
+  postId: string;
+  title: string;
+}) {
+  const { error } = await dbClient
+    .from("comments")
+    .insert({ user_id: userId, post_id: postId, title });
+
+  if (error) {
+    console.log("Error occured at insertComment", error);
+  }
+
+  return { error };
+}
