@@ -25,7 +25,7 @@ export function WritePost({ userId, postId }: WritePostProps) {
   const isDisabled = isPosting || !title;
   const isComment = Boolean(postId);
 
-  const postActionUrl = isComment ? "resources/comment" : "/resources/post";
+  const postActionUrl = isComment ? "/resources/comment" : "/resources/post";
 
   const postTitle = () => {
     const formData = {

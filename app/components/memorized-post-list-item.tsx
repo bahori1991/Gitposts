@@ -4,6 +4,7 @@ import { Post } from "./post";
 import { ViewLikes } from "./view-likes";
 import { ViewComments } from "./view-comments";
 import { formatToXDate } from "~/lib/utils";
+import { useLocation } from "@remix-run/react";
 
 export const MemorizedPostListItem = memo(
   ({
@@ -13,6 +14,15 @@ export const MemorizedPostListItem = memo(
     post: CombinedPostWithAuthorAndLikes;
     index: number;
   }) => {
+    const location = useLocation();
+    let pathnameWithSearchQuery = "";
+
+    if (location.search) {
+      pathnameWithSearchQuery = `${location.pathname}/${post.id}${location.search}`;
+    } else {
+      pathnameWithSearchQuery = `${location.pathname}/${post.id}`;
+    }
+
     return (
       <Post
         avatarUrl={post.author.avatar_url}
@@ -26,11 +36,11 @@ export const MemorizedPostListItem = memo(
         <ViewLikes
           likes={post.likes.length}
           likedByUser={post.isLikedByUser}
-          pathname={"profile/bahori1991"}
+          pathname={pathnameWithSearchQuery}
         />
         <ViewComments
           comments={post.comments.length}
-          pathname="/profile/baori1991"
+          pathname={pathnameWithSearchQuery}
         />
       </Post>
     );

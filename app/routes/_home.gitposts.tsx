@@ -1,5 +1,11 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  json,
+  Outlet,
+  redirect,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { InfiniteVirtualList } from "~/components/infinite-virtual-list";
 import { PostSearch } from "~/components/post-search";
 import { Separator } from "~/components/ui/separator";
@@ -59,6 +65,7 @@ export default function Gitposts() {
 
   return (
     <div className="w-full max-w-xl px-4 flex flex-col">
+      <Outlet />
       <Tabs defaultValue="view-posts" className="my-2">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="view-posts">View Posts</TabsTrigger>

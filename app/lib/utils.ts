@@ -1,7 +1,7 @@
 import { User } from "@supabase/supabase-js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { PostWithDetails } from "./types";
+import { PostWithCommentDetails, PostWithDetails } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -48,4 +48,30 @@ export function formatToXDate(dateTimeString: string) {
 
   const formattedDate = `${ampm}${hours}:${minutes} ･ ${year}年${month}月${day}日`;
   return formattedDate;
+}
+
+export function combinePostsWithLikesAndComments(
+  data: PostWithCommentDetails[] | null,
+  userId: string
+) {
+  const posts =
+    data?.map((post) => {
+      const commentsWithAvatarUrl = post.comments.map((comment) => ({
+        ...comment,
+        author: {
+          username: comment.author!.username,
+          avatarUrl: comment.author!.avatar_url,
+        },
+      }));
+
+      return {
+        ...post,
+        isLikedByUser: !!post.likes.find((like) => like.user_id === userId),
+        likes: post.likes,
+        comments: commentsWithAvatarUrl,
+        author: post.author!,
+      };
+    }) ?? [];
+
+  return posts;
 }
