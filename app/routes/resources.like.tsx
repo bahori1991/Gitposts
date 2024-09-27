@@ -1,6 +1,8 @@
 import { ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect, useFetcher } from "@remix-run/react";
+import { useEffect } from "react";
 import { FaStar } from "react-icons/fa";
+import { useToast } from "~/hooks/use-toast";
 import { deleteLike, insertLike } from "~/lib/database.server";
 import { getSupabaseWithSessionAndHeaders } from "~/lib/supabase.server";
 
@@ -58,7 +60,30 @@ type LikeProps = {
 };
 
 export function Like({ likedByUser, likes, postId, userId }: LikeProps) {
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<typeof action>();
+  const inFlightAction = fetcher.formData?.get("action");
+  const isLoading = fetcher.state !== "idle";
+  const { toast } = useToast();
+
+  const optimisticLikedByUser = inFlightAction
+    ? inFlightAction === "like"
+    : likedByUser;
+
+  const optimisticLikes = inFlightAction
+    ? inFlightAction === "like"
+      ? likes + 1
+      : likes - 1
+    : likes;
+
+  useEffect(() => {
+    if (fetcher.data?.error && !isLoading) {
+      toast({
+        variant: "destructive",
+        description: `Error occurred: ${fetcher.data.error}`,
+      });
+    }
+  }, [fetcher.data, isLoading, toast]);
+
   return (
     <fetcher.Form action="/resources/like" method="post">
       <input type="hidden" name="postId" value={postId} />
@@ -66,16 +91,19 @@ export function Like({ likedByUser, likes, postId, userId }: LikeProps) {
       <input
         type="hidden"
         name="action"
-        value={likedByUser ? "unlike" : "like"}
+        value={optimisticLikedByUser ? "unlike" : "like"}
       />
-      <button className="group flex items-center focus:outline-none">
+      <button
+        className="group flex items-center focus:outline-none"
+        disabled={isLoading}
+      >
         <FaStar
           className={`w-4 h-4 text-yellow-500 group-hover:text-gray-500 ${
-            likedByUser ? "text-blue-700" : "text-gray-500"
+            optimisticLikedByUser ? "text-blue-700" : "text-gray-500"
           }`}
         />
         <span className="ml-2 text-sm text-yellow-500 group-hover:text-gray-500">
-          {likes}
+          {optimisticLikes}
         </span>
       </button>
     </fetcher.Form>

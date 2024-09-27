@@ -14,6 +14,7 @@ import {
   getSupabaseWithSessionAndHeaders,
 } from "./lib/supabase.server";
 import { useSupabase } from "./lib/supabase";
+import { Toaster } from "./components/ui/toaster";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -54,7 +55,8 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="overscroll--none">
+        <Toaster />
         <Outlet context={{ supabase, domainUrl }} />
         <ScrollRestoration />
         <Scripts />
