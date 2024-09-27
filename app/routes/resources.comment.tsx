@@ -17,6 +17,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const postId = formData.get("postId")?.toString();
   const userId = formData.get("userId")?.toString();
 
+  const skipRevalidation = ["gitposts", "profile.$username"];
+
   if (!userId || !title || !postId) {
     return json(
       { error: "Post/user information missing" },
@@ -35,5 +37,5 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ error: "Failed to comment" }, { status: 500, headers });
   }
 
-  return json({ ok: true, error: null }, { headers });
+  return json({ ok: true, error: null, skipRevalidation }, { headers });
 }

@@ -1,22 +1,39 @@
-import { useFetcher, useLocation } from "@remix-run/react";
+import { useFetcher, useLocation, useRouteLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import type { loader as postsLoader } from "~/routes/_home.gitposts";
+import { loader as postsLoader } from "~/routes/_home.gitposts";
+import { loader as postLoader } from "~/routes/_home.gitposts.$postId";
 import { CombinedPostsWithAuthorAndLikes } from "~/lib/types";
 
 type UseInfnitePosts = {
   incomingPosts: CombinedPostsWithAuthorAndLikes;
   totalPages: number;
+  postRouteId: string;
 };
 
 export const useInfinitePosts = ({
   incomingPosts,
   totalPages,
+  postRouteId,
 }: UseInfnitePosts) => {
   const [posts, setPosts] =
     useState<CombinedPostsWithAuthorAndLikes>(incomingPosts);
   const fetcher = useFetcher<typeof postsLoader>();
   const [currentPage, setCurrentPage] = useState(1);
   const location = useLocation();
+  const data = useRouteLoaderData<typeof postLoader>(postRouteId);
+
+  useEffect(() => {
+    const updatedPost = data?.post;
+
+    if (updatedPost) {
+      setPosts((posts) =>
+        posts.map((post) =>
+          post.id === updatedPost.id ? { ...updatedPost } : post
+        )
+      );
+    }
+  }, [data]);
+
   const hasMorePages = currentPage < totalPages;
 
   const [prevPosts, setPrevPosts] = useState(incomingPosts);

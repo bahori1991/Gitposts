@@ -18,6 +18,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const postId = formData.get("postId")?.toString();
   const userId = formData.get("userId")?.toString();
 
+  const skipRevalidation = ["gitposts", "profile.$username"];
+
   if (!userId || !postId) {
     return json(
       { error: "User or Tweet Id missing" },
@@ -29,17 +31,23 @@ export async function action({ request }: ActionFunctionArgs) {
     const { error } = await insertLike({ dbClient: supabase, userId, postId });
 
     if (error) {
-      return json({ error: "Failed to like" }, { status: 500, headers });
+      return json(
+        { error: "Failed to like", skipRevalidation },
+        { status: 500, headers }
+      );
     }
   } else {
     const { error } = await deleteLike({ dbClient: supabase, userId, postId });
 
     if (error) {
-      return json({ error: "Faild to dislike" }, { status: 500, headers });
+      return json(
+        { error: "Faild to dislike", skipRevalidation },
+        { status: 500, headers }
+      );
     }
   }
 
-  return json({ ok: true, error: null }, { headers });
+  return json({ ok: true, error: null, skipRevalidation }, { headers });
 }
 
 type LikeProps = {

@@ -3,6 +3,7 @@ import {
   json,
   Outlet,
   redirect,
+  ShouldRevalidateFunctionArgs,
   useLoaderData,
   useNavigation,
 } from "@remix-run/react";
@@ -82,4 +83,19 @@ export default function Gitposts() {
       </Tabs>
     </div>
   );
+}
+
+export function shouldRevalidate({
+  actionResult,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  const skipRevalidation =
+    actionResult?.skipRevalidation &&
+    actionResult?.skipRevalidation?.includes("gitposts");
+
+  if (skipRevalidation) {
+    return false;
+  }
+
+  return defaultShouldRevalidate;
 }
